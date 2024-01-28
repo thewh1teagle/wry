@@ -343,6 +343,47 @@ impl InnerWebView {
               accept_first_mouse as extern "C" fn(&Object, Sel, id) -> BOOL,
             );
 
+
+
+
+            // decl.add_method(
+            //   sel!(flagsChanged:),
+            //   flags_changed as extern "C" fn(&Object, Sel, id) -> BOOL,
+            // );
+
+            // decl.add_method(
+            //   sel!(keyDown:),
+            //   key_down as extern "C" fn(&mut Object, Sel, id) -> BOOL,
+            // );
+
+            // extern "C" fn key_down(_this: &mut Object, _sel: Sel, event: id) -> BOOL {
+            //   // unsafe {
+            //   //   let app = cocoa::appkit::NSApp();
+            //   //   let menu: id = msg_send![app, mainMenu];
+            //   //   let () = msg_send![menu, performKeyEquivalent: event];
+            //   // }
+            //   YES
+            // }
+
+            decl.add_method(
+              sel!(performKeyEquivalent:),
+              key_equivalent as extern "C" fn(&mut Object, Sel, id) -> BOOL,
+            );
+
+            extern "C" fn key_equivalent(_this: &mut Object, _sel: Sel, event: id) -> BOOL {
+              unsafe {
+                let app = cocoa::appkit::NSApp();
+                let menu: id = msg_send![app, mainMenu];
+                let () = msg_send![menu, performKeyEquivalent: event];
+              }
+              YES
+            }
+
+
+    
+
+
+
             extern "C" fn accept_first_mouse(this: &Object, _sel: Sel, _event: id) -> BOOL {
               unsafe {
                 let accept: bool = *this.get_ivar(ACCEPT_FIRST_MOUSE);
@@ -353,6 +394,28 @@ impl InnerWebView {
                 }
               }
             }
+
+     
+  
+
+    
+  
+
+            extern "C" fn flags_changed(this: &Object, _sel: Sel, event: id) -> BOOL {
+    
+              unsafe {
+                let app = cocoa::appkit::NSApp();
+                let menu: id = msg_send![app, mainMenu];
+                let () = msg_send![menu, performKeyEquivalent: event];
+              }
+              println!("Modifier Flags Changed");
+              NO
+              // Call key_down method to handle key events  
+            } 
+          
+
+
+       
           }
           decl.register()
         }
@@ -892,8 +955,11 @@ r#"Object.defineProperty(window, 'ipc', {
       #[cfg(target_os = "macos")]
       {
         if is_child {
+          println!("is child");
+          
           let _: () = msg_send![ns_view, addSubview: webview];
         } else {
+          println!("is parent");
           let parent_view_cls = match ClassDecl::new("WryWebViewParent", class!(NSView)) {
             Some(mut decl) => {
               decl.add_method(

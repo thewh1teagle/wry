@@ -67,7 +67,7 @@ fn main() -> wry::Result<()> {
       width: size.width / 2,
       height: size.height / 2,
     })
-    .with_url("https://twitter.com/TauriApps")?
+    .with_url("https://google.com/TauriApps")?
     .build()?;
   let webview4 = WebViewBuilder::new_as_child(&window)
     .with_bounds(Rect {
