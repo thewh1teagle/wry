@@ -343,6 +343,22 @@ impl InnerWebView {
               accept_first_mouse as extern "C" fn(&Object, Sel, id) -> BOOL,
             );
 
+            decl.add_method(
+              sel!(acceptsFirstResponder),
+              accepts_first_responder as extern "C" fn(&Object, Sel) -> BOOL,
+            );
+            decl.add_method(
+              sel!(keyDown:),
+              key_down as extern "C" fn(&mut Object, Sel, id) -> BOOL,
+            );
+
+            decl.add_method(
+              sel!(flagsChanged:),
+              flags_changed as extern "C" fn(&Object, Sel, id) -> BOOL,
+            );
+
+
+
             extern "C" fn accept_first_mouse(this: &Object, _sel: Sel, _event: id) -> BOOL {
               unsafe {
                 let accept: bool = *this.get_ivar(ACCEPT_FIRST_MOUSE);
@@ -353,6 +369,35 @@ impl InnerWebView {
                 }
               }
             }
+
+            extern "C" fn key_down(_this: &mut Object, _sel: Sel, _event: id) -> BOOL {
+              println!("keydown");
+              NO
+            }
+            extern "C" fn accepts_first_responder(_this: &Object, _sel: Sel) -> BOOL {
+              println!("accept first");
+              YES
+             }
+
+            extern "C" fn flags_changed(this: &Object, _sel: Sel, event: id) -> BOOL {
+    
+          
+              println!("Modifier Flags Changed");
+              NO
+              // Call key_down method to handle key events  
+            } 
+          
+
+            extern "C" fn become_first_responder(this: &Object, _sel: Sel) -> BOOL {
+              println!("become first");
+              NO  
+            }
+          decl.add_method(
+            sel!(becomeFirstResponder),
+            become_first_responder as extern "C" fn(&Object, Sel) -> BOOL,
+          );
+
+       
           }
           decl.register()
         }
@@ -892,8 +937,13 @@ r#"Object.defineProperty(window, 'ipc', {
       #[cfg(target_os = "macos")]
       {
         if is_child {
+          println!("is child");
+          // let ns_window: id = msg_send![ns_view, window];
+          
           let _: () = msg_send![ns_view, addSubview: webview];
+          let _: () = msg_send![ns_window, makeFirstResponder: webview];
         } else {
+          println!("is parent");
           let parent_view_cls = match ClassDecl::new("WryWebViewParent", class!(NSView)) {
             Some(mut decl) => {
               decl.add_method(
