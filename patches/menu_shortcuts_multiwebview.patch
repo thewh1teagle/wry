@@ -1,0 +1,32 @@
+diff --git a/src/wkwebview/mod.rs b/src/wkwebview/mod.rs
+index d6a9ef4..de4ac28 100644
+--- a/src/wkwebview/mod.rs
++++ b/src/wkwebview/mod.rs
+@@ -340,6 +340,11 @@ impl InnerWebView {
+               accept_first_mouse as extern "C" fn(&Object, Sel, id) -> BOOL,
+             );
+ 
++            decl.add_method(
++              sel!(performKeyEquivalent:),
++              key_equivalent as extern "C" fn(&mut Object, Sel, id) -> BOOL,
++            );
++
+             extern "C" fn accept_first_mouse(this: &Object, _sel: Sel, _event: id) -> BOOL {
+               unsafe {
+                 let accept: bool = *this.get_ivar(ACCEPT_FIRST_MOUSE);
+@@ -350,6 +355,15 @@ impl InnerWebView {
+                 }
+               }
+             }
++
++            extern "C" fn key_equivalent(_this: &mut Object, _sel: Sel, event: id) -> BOOL {
++              unsafe {
++                let app = cocoa::appkit::NSApp();
++                let menu: id = msg_send![app, mainMenu];
++                let () = msg_send![menu, performKeyEquivalent: event];
++              }
++              YES
++            }
+           }
+           decl.register()
+         }
