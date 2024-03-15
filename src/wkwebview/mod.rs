@@ -362,7 +362,7 @@ impl InnerWebView {
                 let menu: id = msg_send![app, mainMenu];
                 let () = msg_send![menu, performKeyEquivalent: event];
               }
-              YES
+              NO
             }
           }
           decl.register()
