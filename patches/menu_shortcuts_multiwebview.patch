@@ -25,7 +25,7 @@ index d6a9ef4..de4ac28 100644
 +                let menu: id = msg_send![app, mainMenu];
 +                let () = msg_send![menu, performKeyEquivalent: event];
 +              }
-+              YES
++              NO
 +            }
            }
            decl.register()
